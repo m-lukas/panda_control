@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List
 
-from controls import move_to_pose
+from controls import DEFAULT_ARM_SPEED, move_to_pose
 from notifier import notify_arm_location
 
 
@@ -35,17 +35,18 @@ def move_to_right_tray(move_group):
     right_tray_handovers += 1
 
 
-def move_to_packaging(move_group, speed):
+def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
     # move to packaging common
     notify_arm_location("packaging")
     # move to specific container
     # rotate gripper
     # rotate gripper back
-    # (move to packaging commong)
+    # (move to packaging common)
+    notify_arm_location("handover_finished")
     pass
 
 
-def move_to_idle(move_group, speed):
+def move_to_idle(move_group, speed=DEFAULT_ARM_SPEED):
     # move waiting position
     notify_arm_location("idle")
     pass
