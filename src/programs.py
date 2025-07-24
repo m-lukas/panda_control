@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List
 
-from controls import DEFAULT_ARM_SPEED, move_to_pose
+from controls import DEFAULT_ARM_SPEED, move_to_pose, home_gripper, move_to_home, grasp
 from notifier import notify_arm_location
 
 
@@ -88,7 +88,7 @@ def move_to_right_tray(move_group):
 
 def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
     # move to packaging common
-    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, 0.03935009241104126, 0.03935009241104126, None, None, speed)
+    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, speed)
     notify_arm_location("packaging")
 
     # move to specific container and rotate
@@ -104,15 +104,13 @@ def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
         # account for errors
     
     # move to packaging common
-    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, 0.03935009241104126, 0.03935009241104126, None, None, speed)
+    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, speed)
     notify_arm_location("handover_finished")
-    pass
 
 
 def move_to_idle(move_group, speed=DEFAULT_ARM_SPEED):
-    move_to_pose(move_group, -0.505050320742423, -1.6532131750876442, 1.7703606261203162, -2.2126660369571907, 0.057320122092962264, 2.7077054580979873, -0.6423482887413765, 0.039349764585494995, 0.039349764585494995, None, None, speed)
+    move_to_pose(move_group, -0.505050320742423, -1.6532131750876442, 1.7703606261203162, -2.2126660369571907, 0.057320122092962264, 2.7077054580979873, -0.6423482887413765, None, None, speed)
     notify_arm_location("idle")
-    pass
 
 
 PROGRAMS: Dict[str, Callable] = {
@@ -121,3 +119,26 @@ PROGRAMS: Dict[str, Callable] = {
     "move_to_packaging": move_to_packaging,
     "move_to_idle": move_to_idle,
 }
+
+
+def prepare_experiment(home_gripper_client, grasp_client, move_group) -> None:
+    home_gripper(home_gripper_client)
+    move_to_home(move_group)
+    move_to_idle(move_group)
+    grasp(grasp_client, 0.035)
+    print("Press ENTER to grasp bowl ...")
+    input()
+    grasp(grasp_client, 0.03)
+    print("Press ENTER to continue ...")
+    input()
+
+
+def end_experiment(home_gripper_client, grasp_client, move_group) -> None:
+    move_to_idle(move_group)
+    print("Press ENTER to release bowl ...")
+    input()
+    grasp(grasp_client, 0.035)
+    print("Press ENTER to when you removed the bowl ...")
+    input()
+    move_to_home(move_group)
+    home_gripper(home_gripper_client)

@@ -9,7 +9,7 @@ import actionlib
 from flask import Flask, request, jsonify
 from franka_gripper.msg import HomingAction, MoveAction
 
-from programs import PROGRAMS  # PROGRAMS is imported from programs.py
+from programs import PROGRAMS, prepare_experiment  # PROGRAMS is imported from programs.py
 
 def control():
     # 1) Standard MoveIt + ROS initialization
@@ -29,7 +29,7 @@ def control():
     rospy.loginfo("End effector link: %s" % move_group.get_end_effector_link())
     rospy.loginfo("Available Planning Groups: %s" % robot.get_group_names())
 
-    move_to_idle(move_group)
+    #prepare_experiment(home_gripper_client, grasp_client, move_group)
 
     # At this point all your controllers, clients, etc. are ready.
     # ─────────────────────────────────────────────────────────────────────
@@ -37,32 +37,37 @@ def control():
     app = Flask(__name__)
     program_lock = threading.Lock()  # ensures only one program runs at a time
 
-    def _run_program(name, params):
+    def _run_program(name):
         try:
             rospy.loginfo(f"Starting program '{name}'")
             # dispatch to your function; most programs take only move_group,
             # others may read extra params from the JSON body
-            PROGRAMS[name](move_group, **params)
+            PROGRAMS[name](move_group)
             rospy.loginfo(f"Program '{name}' completed")
         except Exception as e:
             rospy.logerr(f"Error in program '{name}': {e}")
         finally:
-            program_lock.release()
+            pass
+            # program_lock.release()
 
     @app.route('/start/<program_name>', methods=['POST'])
     def start_program(program_name):
+        rospy.loginfo(f"Program '{program_name}' requested")
         if program_name not in PROGRAMS:
+            rospy.loginfo(f"Program '{program_name}' does not exist")
             return jsonify({'error': 'Unknown program'}), 400
 
-        # try to grab lock, if already held => someone else is running
-        if not program_lock.acquire(blocking=False):
-            return jsonify({'error': 'Another program is already running'}), 409
+        # temporary
+        # program_lock.release()
 
-        params = request.get_json() or {}
+        # # try to grab lock, if already held => someone else is running
+        # if not program_lock.acquire(blocking=False):
+        #     return jsonify({'error': 'Another program is already running'}), 409
+
         # launch the program in its own thread so we return immediately
         t = threading.Thread(
             target=_run_program,
-            args=(program_name, params),
+            args=(program_name,),
             daemon=True
         )
         t.start()
