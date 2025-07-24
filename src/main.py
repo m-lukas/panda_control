@@ -29,6 +29,8 @@ def control():
     rospy.loginfo("End effector link: %s" % move_group.get_end_effector_link())
     rospy.loginfo("Available Planning Groups: %s" % robot.get_group_names())
 
+    move_to_idle(move_group)
+
     # At this point all your controllers, clients, etc. are ready.
     # ─────────────────────────────────────────────────────────────────────
     # 2) Set up a Flask app to receive HTTP start commands

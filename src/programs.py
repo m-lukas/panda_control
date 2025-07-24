@@ -4,19 +4,46 @@ from controls import DEFAULT_ARM_SPEED, move_to_pose
 from notifier import notify_arm_location
 
 
-left_tray_index = 0
-right_tray_index = 0
-
-packaging_containers: List[tuple] = []
-current_container_index = 0
-number_of_items_in_container = 0
-
-
 class MoveToHandoverProgram:
     def __init__(self, target_1: tuple, target_2: tuple, speed: float):
       self.target_1 = target_1
       self.target_2 = target_2
       self.speed = speed
+
+
+class ContainerProgram:
+    def __init__(self, container_pose: tuple, rotation_pose: tuple):
+      self.container_pose = container_pose
+      self.rotation_pose = rotation_pose
+
+
+left_tray_index = 0
+right_tray_index = 0
+
+packaging_containers: List[ContainerProgram] = [
+    ContainerProgram(
+        [-0.37416483700484554, -1.7609308158640273, 1.6337540907943455, -1.4945198083342168, 0.1907236667373894, 3.478999657723638, -0.8049308530953194, 0.03934943675994873, 0.03934943675994873],
+        [-0.3502987653160582, -1.7509824656574864, 1.623425122768145, -1.5075764313915316, 0.19090675082471636, 3.4782858388556375, 0.3781939363016022, 0.039350420236587524, 0.039350420236587524]
+    ),
+    ContainerProgram(
+        [-0.37416483700484554, -1.7609308158640273, 1.6337540907943455, -1.4945198083342168, 0.1907236667373894, 3.478999657723638, -0.8049308530953194, 0.03934943675994873, 0.03934943675994873],
+        [-0.3502987653160582, -1.7509824656574864, 1.623425122768145, -1.5075764313915316, 0.19090675082471636, 3.4782858388556375, 0.3781939363016022, 0.039350420236587524, 0.039350420236587524]
+    ),
+    ContainerProgram(
+        [-0.37416483700484554, -1.7609308158640273, 1.6337540907943455, -1.4945198083342168, 0.1907236667373894, 3.478999657723638, -0.8049308530953194, 0.03934943675994873, 0.03934943675994873],
+        [-0.3502987653160582, -1.7509824656574864, 1.623425122768145, -1.5075764313915316, 0.19090675082471636, 3.4782858388556375, 0.3781939363016022, 0.039350420236587524, 0.039350420236587524]
+    ),
+    ContainerProgram(
+        [-0.37416483700484554, -1.7609308158640273, 1.6337540907943455, -1.4945198083342168, 0.1907236667373894, 3.478999657723638, -0.8049308530953194, 0.03934943675994873, 0.03934943675994873],
+        [-0.3502987653160582, -1.7509824656574864, 1.623425122768145, -1.5075764313915316, 0.19090675082471636, 3.4782858388556375, 0.3781939363016022, 0.039350420236587524, 0.039350420236587524]
+    ),
+    ContainerProgram(
+        [-0.37416483700484554, -1.7609308158640273, 1.6337540907943455, -1.4945198083342168, 0.1907236667373894, 3.478999657723638, -0.8049308530953194, 0.03934943675994873, 0.03934943675994873],
+        [-0.3502987653160582, -1.7509824656574864, 1.623425122768145, -1.5075764313915316, 0.19090675082471636, 3.4782858388556375, 0.3781939363016022, 0.039350420236587524, 0.039350420236587524]
+    ),
+]
+current_container_index = 0
+number_of_items_in_container = 0
 
 
 left_tray_handovers: List[MoveToHandoverProgram] = [
@@ -63,17 +90,21 @@ def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
     # move to packaging common
     move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, 0.03935009241104126, 0.03935009241104126, None, None, speed)
     notify_arm_location("packaging")
-    # move to specific container
-    c = packaging_containers[current_container_index]
-    move_to_pose(move_group, c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7])
+
+    # move to specific container and rotate
+    cp = packaging_containers[current_container_index]
+    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], cp.container_pose[7], None, None, speed)
+    move_to_pose(move_group, cp.rotation_pose[0], cp.rotation_pose[1], cp.rotation_pose[2], cp.rotation_pose[3], cp.rotation_pose[4], cp.rotation_pose[5], cp.rotation_pose[6], cp.rotation_pose[7], None, None, speed)
+    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], cp.container_pose[7], None, None, speed)
+
     number_of_items_in_container += 1
     if number_of_items_in_container == 8:
         current_container_index += 1
         number_of_items_in_container = 0
         # account for errors
-    # rotate gripper
-    # rotate gripper back
-    # (move to packaging common)
+    
+    # move to packaging common
+    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, 0.03935009241104126, 0.03935009241104126, None, None, speed)
     notify_arm_location("handover_finished")
     pass
 
