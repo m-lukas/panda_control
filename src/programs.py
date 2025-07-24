@@ -19,8 +19,20 @@ class MoveToHandoverProgram:
       self.speed = speed
 
 
-left_tray_handovers: List[MoveToHandoverProgram] = []
-right_tray_handovers: List[MoveToHandoverProgram] = []
+left_tray_handovers: List[MoveToHandoverProgram] = [
+    MoveToHandoverProgram(
+        [-1.9553351520631692, -1.7289233916600544, 1.764272976147765, -2.25836604827747, 0.15970306820339625, 3.5636313774663098, -0.781281786011325, 0.039349764585494995, 0.039349764585494995],
+        [-2.3174051406017306, -1.7464846269616918, 1.7174293490793224, -1.8560868397825845, 0.19099589394198524, 3.5632729483577936, -0.8292145864632393, 0.03934943675994873, 0.03934943675994873],
+        DEFAULT_ARM_SPEED
+    )
+]
+right_tray_handovers: List[MoveToHandoverProgram] = [
+    MoveToHandoverProgram(
+        [-1.5547487497664334, -1.7548655496061893, 1.8098866582403617, -2.195141738907591, 0.19108510024017758, 3.6259514539374242, -0.7562993065979746, 0.03935009241104126, 0.03935009241104126],
+        [-1.979525540786877, -1.7568802659049967, 1.7494914613459918, -1.6939346870251333, 0.1910150717364417, 3.625722295510163, -0.8387378708985116, 0.03934943675994873, 0.03934943675994873],
+        DEFAULT_ARM_SPEED
+    )
+]
 
 
 def move_to_left_tray(move_group):
@@ -49,8 +61,8 @@ def move_to_right_tray(move_group):
 
 def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
     # move to packaging common
+    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, 0.03935009241104126, 0.03935009241104126, None, None, speed)
     notify_arm_location("packaging")
-
     # move to specific container
     c = packaging_containers[current_container_index]
     move_to_pose(move_group, c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7])
@@ -67,7 +79,7 @@ def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
 
 
 def move_to_idle(move_group, speed=DEFAULT_ARM_SPEED):
-    # move waiting position
+    move_to_pose(move_group, -0.505050320742423, -1.6532131750876442, 1.7703606261203162, -2.2126660369571907, 0.057320122092962264, 2.7077054580979873, -0.6423482887413765, 0.039349764585494995, 0.039349764585494995, None, None, speed)
     notify_arm_location("idle")
     pass
 
