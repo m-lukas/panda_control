@@ -29,8 +29,6 @@ def control():
     rospy.loginfo("End effector link: %s" % move_group.get_end_effector_link())
     rospy.loginfo("Available Planning Groups: %s" % robot.get_group_names())
 
-    #prepare_experiment(home_gripper_client, grasp_client, move_group)
-
     # At this point all your controllers, clients, etc. are ready.
     # ─────────────────────────────────────────────────────────────────────
     # 2) Set up a Flask app to receive HTTP start commands
@@ -42,7 +40,7 @@ def control():
             rospy.loginfo(f"Starting program '{name}'")
             # dispatch to your function; most programs take only move_group,
             # others may read extra params from the JSON body
-            PROGRAMS[name](move_group)
+            PROGRAMS[name](move_group, home_gripper_client, grasp_client)
             rospy.loginfo(f"Program '{name}' completed")
         except Exception as e:
             rospy.logerr(f"Error in program '{name}': {e}")
@@ -69,17 +67,17 @@ def control():
         t.start()
         return jsonify({'status': 'Program started'}), 200
 
-    # 3) Fire up Flask in a background thread
+    # flask in background thread
     server = threading.Thread(
         target=lambda: app.run(host='0.0.0.0', port=5000),
         daemon=True
     )
     server.start()
 
-    # 4) Keep the ROS node alive (so Flask lives on with ROS)
+    # keep ros alive
     rospy.spin()
 
-    # 5) Clean up
+    # clean up
     moveit_commander.roscpp_shutdown()
 
 if __name__ == '__main__':

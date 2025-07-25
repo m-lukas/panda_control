@@ -62,7 +62,7 @@ right_tray_handovers: List[MoveToHandoverProgram] = [
 ]
 
 
-def move_to_left_tray(move_group):
+def move_to_left_tray(move_group, *args, **kwargs):
     global left_tray_handovers, left_tray_index
 
     program = left_tray_handovers[left_tray_index]
@@ -76,7 +76,7 @@ def move_to_left_tray(move_group):
     left_tray_index += 1
 
 
-def move_to_right_tray(move_group):
+def move_to_right_tray(move_group, *args, **kwargs):
     global right_tray_handovers, right_tray_index
 
     program = right_tray_handovers[right_tray_index]
@@ -90,10 +90,10 @@ def move_to_right_tray(move_group):
     right_tray_index += 1
 
 
-def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
+def move_to_packaging(move_group, *args, **kwargs):
     global current_container_index, number_of_items_in_container
     # move to packaging common
-    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, speed)
+    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, 0.2)
     notify_arm_location("packaging")
 
     # move to specific container and rotate
@@ -114,20 +114,12 @@ def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
     notify_arm_location("handover_finished")
 
 
-def move_to_idle(move_group, speed=DEFAULT_ARM_SPEED):
-    move_to_pose(move_group, -0.505050320742423, -1.6532131750876442, 1.7703606261203162, -2.2126660369571907, 0.057320122092962264, 2.7077054580979873, -0.6423482887413765, None, None, speed)
+def move_to_idle(move_group, *args, **kwargs):
+    move_to_pose(move_group, -0.505050320742423, -1.6532131750876442, 1.7703606261203162, -2.2126660369571907, 0.057320122092962264, 2.7077054580979873, -0.6423482887413765, None, None, DEFAULT_ARM_SPEED)
     notify_arm_location("idle")
 
 
-PROGRAMS: Dict[str, Callable] = {
-    "move_to_left_tray": move_to_left_tray,
-    "move_to_right_tray": move_to_right_tray,
-    "move_to_packaging": move_to_packaging,
-    "move_to_idle": move_to_idle,
-}
-
-
-def prepare_experiment(home_gripper_client, grasp_client, move_group) -> None:
+def prepare_experiment(move_group, home_gripper_client, grasp_client) -> None:
     home_gripper(home_gripper_client)
     move_to_home(move_group)
     move_to_idle(move_group)
@@ -139,7 +131,7 @@ def prepare_experiment(home_gripper_client, grasp_client, move_group) -> None:
     input()
 
 
-def end_experiment(home_gripper_client, grasp_client, move_group) -> None:
+def end_experiment(move_group, home_gripper_client, grasp_client) -> None:
     move_to_idle(move_group)
     print("Press ENTER to release bowl ...")
     input()
@@ -148,3 +140,13 @@ def end_experiment(home_gripper_client, grasp_client, move_group) -> None:
     input()
     move_to_home(move_group)
     home_gripper(home_gripper_client)
+
+
+PROGRAMS: Dict[str, Callable] = {
+    "move_to_left_tray": move_to_left_tray,
+    "move_to_right_tray": move_to_right_tray,
+    "move_to_packaging": move_to_packaging,
+    "move_to_idle": move_to_idle,
+    "prepare_experiment": prepare_experiment,
+    "end_experiment": end_experiment,
+}
