@@ -47,8 +47,7 @@ def control():
         except Exception as e:
             rospy.logerr(f"Error in program '{name}': {e}")
         finally:
-            pass
-            # program_lock.release()
+            program_lock.release()
 
     @app.route('/start/<program_name>', methods=['POST'])
     def start_program(program_name):
@@ -57,12 +56,9 @@ def control():
             rospy.loginfo(f"Program '{program_name}' does not exist")
             return jsonify({'error': 'Unknown program'}), 400
 
-        # temporary
-        # program_lock.release()
-
         # # try to grab lock, if already held => someone else is running
-        # if not program_lock.acquire(blocking=False):
-        #     return jsonify({'error': 'Another program is already running'}), 409
+        if not program_lock.acquire(blocking=False):
+            return jsonify({'error': 'Another program is already running'}), 409
 
         # launch the program in its own thread so we return immediately
         t = threading.Thread(

@@ -63,48 +63,54 @@ right_tray_handovers: List[MoveToHandoverProgram] = [
 
 
 def move_to_left_tray(move_group):
+    global left_tray_handovers, left_tray_index
+
     program = left_tray_handovers[left_tray_index]
 
     # move to close to handover location
-    move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], program.target_1[7], None, None, program.speed)
+    move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], None, None, program.speed)
     notify_arm_location("handover_location")
 
     # move to specific handover location
-    move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6], program.target_2[7])
-    left_tray_handovers += 1
+    move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6])
+    left_tray_index += 1
 
 
 def move_to_right_tray(move_group):
+    global right_tray_handovers, right_tray_index
+
     program = right_tray_handovers[right_tray_index]
 
     # move to close to handover location
-    move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], program.target_1[7], None, None, program.speed)
+    move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], None, None, program.speed)
     notify_arm_location("handover_location")
 
     # move to specific handover location
-    move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6], program.target_2[7])
-    right_tray_handovers += 1
+    move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6])
+    right_tray_index += 1
 
 
 def move_to_packaging(move_group, speed=DEFAULT_ARM_SPEED):
+    global current_container_index, number_of_items_in_container
     # move to packaging common
     move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, speed)
     notify_arm_location("packaging")
 
     # move to specific container and rotate
     cp = packaging_containers[current_container_index]
-    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], cp.container_pose[7], None, None, speed)
-    move_to_pose(move_group, cp.rotation_pose[0], cp.rotation_pose[1], cp.rotation_pose[2], cp.rotation_pose[3], cp.rotation_pose[4], cp.rotation_pose[5], cp.rotation_pose[6], cp.rotation_pose[7], None, None, speed)
-    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], cp.container_pose[7], None, None, speed)
+    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.3)
+    move_to_pose(move_group, cp.rotation_pose[0], cp.rotation_pose[1], cp.rotation_pose[2], cp.rotation_pose[3], cp.rotation_pose[4], cp.rotation_pose[5], cp.rotation_pose[6], None, None, 0.5)
+    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.5)
 
     number_of_items_in_container += 1
+    print("Current Container:", current_container_index, "--", "Number of Items:", number_of_items_in_container)
     if number_of_items_in_container == 8:
         current_container_index += 1
         number_of_items_in_container = 0
         # account for errors
     
     # move to packaging common
-    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, speed)
+    move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, 0.3)
     notify_arm_location("handover_finished")
 
 
