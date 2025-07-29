@@ -1,7 +1,7 @@
 from typing import Callable, Dict, List
 
 from controls import DEFAULT_ARM_SPEED, move_to_pose, home_gripper, move_to_home, grasp
-from notifier import notify_arm_location
+from notifier import notify_arm_location, notifiy_handover_finished
 
 
 class MoveToHandoverProgram:
@@ -91,7 +91,7 @@ def move_to_right_tray(move_group, *args, **kwargs):
 
 
 def move_to_packaging(move_group, *args, **kwargs):
-    global current_container_index, number_of_items_in_container
+    global packaging_containers, current_container_index, number_of_items_in_container
     # move to packaging common
     move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, 0.2)
     notify_arm_location("packaging")
@@ -107,11 +107,12 @@ def move_to_packaging(move_group, *args, **kwargs):
     if number_of_items_in_container == 8:
         current_container_index += 1
         number_of_items_in_container = 0
-        # account for errors
+
+    if current_container_index >= len(packaging_containers):
+        notifiy_handover_finished()
     
     # move to packaging common
     move_to_pose(move_group, 0.04641734510079024, -1.7589041228378026, 1.791764214141974, -2.195651907233565, 0.19076389835940466, 3.096256562241962, -0.7286347739365364, None, None, 0.3)
-    notify_arm_location("handover_finished")
 
 
 def move_to_idle(move_group, *args, **kwargs):

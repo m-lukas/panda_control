@@ -47,8 +47,14 @@ def control():
         finally:
             program_lock.release()
 
-    @app.route('/start/<program_name>', methods=['POST'])
+    @app.route('/start', methods=['POST'])
     def start_program(program_name):
+        data = request.get_json()
+        try:
+            program_name = data["program"]
+        except (TypeError, ValueError):
+            return jsonify({"error": "Invalid input"}), 400
+
         rospy.loginfo(f"Program '{program_name}' requested")
         if program_name not in PROGRAMS:
             rospy.loginfo(f"Program '{program_name}' does not exist")
@@ -69,7 +75,7 @@ def control():
 
     # flask in background thread
     server = threading.Thread(
-        target=lambda: app.run(host='0.0.0.0', port=5000),
+        target=lambda: app.run(host='0.0.0.0', port=3333),
         daemon=True
     )
     server.start()
