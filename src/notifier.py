@@ -1,25 +1,20 @@
 import requests
-import threading
 
 STATE_MACHINE_URL   = "http://0.0.0.0:1111"
 
 def notify_arm_location(arm_location: str):
-    def _notify():
-        try:
-            requests.post(f"{STATE_MACHINE_URL}/arm_location", json={"location": arm_location}, timeout=0.5)
-            print("Sending to state machine:", arm_location)
-        except Exception as e:
-            print("ERROR while sending data to state machine: ", str(e))
-            pass
-    threading.Thread(target=_notify, daemon=True).start
+    try:
+        requests.post(f"{STATE_MACHINE_URL}/arm_location", json={"location": arm_location}, timeout=0.5)
+        print("Sending to state machine:", arm_location)
+    except Exception as e:
+        print("ERROR while sending data to state machine: ", str(e))
+        pass
 
 
 def notify_handover_finished():
-    def _notify():
-        try:
-            requests.post(f"{STATE_MACHINE_URL}/event", json={"name": "handover_finished"}, timeout=0.5)
-            print("Sending event to state machine: handover_finished")
-        except Exception as e:
-            print("ERROR while sending data to state machine: ", str(e))
-            pass
-    threading.Thread(target=_notify, daemon=True).start
+    try:
+        requests.post(f"{STATE_MACHINE_URL}/event", json={"name": "handover_finished"}, timeout=0.5)
+        print("Sending event to state machine: handover_finished")
+    except Exception as e:
+        print("ERROR while sending data to state machine: ", str(e))
+        pass
