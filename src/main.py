@@ -48,11 +48,11 @@ def control():
             program_lock.release()
 
     @app.route('/start', methods=['POST'])
-    def start_program(program_name):
+    def start_program():
         data = request.get_json()
         try:
             program_name = data["program"]
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, Exception):
             return jsonify({"error": "Invalid input"}), 400
 
         rospy.loginfo(f"Program '{program_name}' requested")
