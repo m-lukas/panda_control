@@ -347,6 +347,11 @@ def end_experiment(move_group, home_gripper_client, grasp_client) -> None:
     home_gripper(home_gripper_client)
 
 
+def home(move_group, home_gripper_client) -> None:
+    move_to_home(move_group)
+    home_gripper(home_gripper_client)
+
+
 PROGRAMS: Dict[str, Callable] = {
     "move_to_left_tray": move_to_left_tray,
     "move_to_right_tray": move_to_right_tray,
@@ -355,4 +360,5 @@ PROGRAMS: Dict[str, Callable] = {
     "wink": wink,
     "prepare_experiment": prepare_experiment,
     "end_experiment": end_experiment,
+    "home": home
 }
