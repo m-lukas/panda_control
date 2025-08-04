@@ -310,6 +310,20 @@ def move_to_idle(move_group, *args, **kwargs):
     notify_arm_location("idle")
 
 
+def wink(move_group, *args, **kwargs):
+    # move to start pose (pose 1)
+    move_to_pose(move_group, -0.244254309526806, -1.5608413373712908, 0.5092606457281394, -2.6472411544866725, 0.310233694963985, 2.836684098336432, -0.8978506462242867, 0.015098736621439457, 0.015098736621439457, 0.3)
+    for _ in range(3):
+        # pose 2
+        move_to_pose(move_group, -0.2412396861298325, -1.4874156718839677, 0.12239705766815866, -2.626299491380373, 0.29815748796529234, 2.8366812502962215, -0.8960650889542368, 0.015098736621439457, 0.015098736621439457, 0.3)
+        # pose 3
+        move_to_pose(move_group, -0.24030484537492716, -1.293151546561911, -0.526760826202861, -2.6645452538077308, 0.3023793460561892, 2.836668788684739, -0.8873241067396269, 0.015098736621439457, 0.015098736621439457, 0.3)
+        # pose 2
+        move_to_pose(move_group, -0.2412396861298325, -1.4874156718839677, 0.12239705766815866, -2.626299491380373, 0.29815748796529234, 2.8366812502962215, -0.8960650889542368, 0.015098736621439457, 0.015098736621439457, 0.3)
+        # pose 1
+        move_to_pose(move_group, -0.244254309526806, -1.5608413373712908, 0.5092606457281394, -2.6472411544866725, 0.310233694963985, 2.836684098336432, -0.8978506462242867, 0.015098736621439457, 0.015098736621439457, 0.3)
+
+
 def prepare_experiment(move_group, home_gripper_client, grasp_client) -> None:
     home_gripper(home_gripper_client)
     move_to_home(move_group)
@@ -338,6 +352,7 @@ PROGRAMS: Dict[str, Callable] = {
     "move_to_right_tray": move_to_right_tray,
     "move_to_packaging": move_to_packaging,
     "move_to_idle": move_to_idle,
+    "wink": wink,
     "prepare_experiment": prepare_experiment,
     "end_experiment": end_experiment,
 }
