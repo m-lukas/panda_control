@@ -6,13 +6,13 @@ import threading
 import rospy
 import moveit_commander
 import actionlib
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from franka_gripper.msg import HomingAction, MoveAction
 
-from programs import PROGRAMS, prepare_experiment  # PROGRAMS is imported from programs.py
+from programs import PROGRAMS
 
 def control():
-    # 1) Standard MoveIt + ROS initialization
+    # MoveIt + ROS initialization
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('panda_move_arm_node', anonymous=True)
 
@@ -29,9 +29,7 @@ def control():
     rospy.loginfo("End effector link: %s" % move_group.get_end_effector_link())
     rospy.loginfo("Available Planning Groups: %s" % robot.get_group_names())
 
-    # At this point all your controllers, clients, etc. are ready.
-    # ─────────────────────────────────────────────────────────────────────
-    # 2) Set up a Flask app to receive HTTP start commands
+    # Setup webserver
     app = Flask(__name__)
     program_lock = threading.Lock()  # ensures only one program runs at a time
 
@@ -46,6 +44,13 @@ def control():
             rospy.logerr(f"Error in program '{name}': {e}")
         finally:
             program_lock.release()
+
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            res = Response()
+            res.headers['X-Content-Type-Options'] = '*'
+            return res
 
     @app.route('/start', methods=['POST'])
     def start_program():
@@ -73,14 +78,14 @@ def control():
         t.start()
         return jsonify({'status': 'Program started'}), 200
 
-    # flask in background thread
+    # Flask in background thread
     server = threading.Thread(
         target=lambda: app.run(host='0.0.0.0', port=3333),
         daemon=True
     )
     server.start()
 
-    # keep ros alive
+    # keep ROS alive
     rospy.spin()
 
     # clean up
