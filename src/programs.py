@@ -319,7 +319,7 @@ def wink(move_group, *args, **kwargs):
         # pose 1
         move_to_pose(move_group, -0.244254309526806, -1.5608413373712908, 0.5092606457281394, -2.6472411544866725, 0.310233694963985, 2.836684098336432, -0.8978506462242867, 0.015098736621439457, 0.015098736621439457, 0.3)
         # idle
-        move_to_idle(move_group)
+    move_to_idle(move_group)
 
 
 def prepare_experiment(move_group, home_gripper_client, grasp_client) -> None:
