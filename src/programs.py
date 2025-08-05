@@ -351,7 +351,7 @@ def home(move_group, home_gripper_client, *args, **kwargs) -> None:
 
 
 def full_test(move_group, *args, **kwargs):
-    for _ in range(40):
+    for _ in range(20):
         move_to_left_tray(move_group)
         move_to_packaging(move_group)
         move_to_right_tray(move_group)
