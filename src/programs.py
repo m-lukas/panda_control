@@ -356,6 +356,7 @@ def full_test(move_group, *args, **kwargs):
         move_to_packaging(move_group)
         move_to_right_tray(move_group)
         move_to_packaging(move_group)
+    move_to_idle(move_group)
 
 
 PROGRAMS: Dict[str, Callable] = {
