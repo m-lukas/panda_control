@@ -6,7 +6,7 @@ import threading
 import rospy
 import moveit_commander
 import actionlib
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, make_response
 from franka_gripper.msg import HomingAction, MoveAction
 
 from programs import PROGRAMS
@@ -45,38 +45,45 @@ def control():
         finally:
             program_lock.release()
 
-    @app.before_request
-    def handle_preflight():
-        if request.method == "OPTIONS":
-            res = Response()
-            res.headers['X-Content-Type-Options'] = '*'
-            return res
+    def _build_cors_preflight_response():
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "*")
+        return response
 
-    @app.route('/start', methods=['POST'])
+    def _corsify_actual_response(response, status_code=200):
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, status_code
+
+    @app.route('/start', methods=["POST", "OPTIONS"])
     def start_program():
-        data = request.get_json()
-        try:
-            program_name = data["program"]
-        except (TypeError, ValueError, Exception):
-            return jsonify({"error": "Invalid input"}), 400
+        if request.method == "OPTIONS": # CORS preflight
+            return _build_cors_preflight_response()
+        elif request.method == "POST":
+            data = request.get_json()
+            try:
+                program_name = data["program"]
+            except (TypeError, ValueError, Exception):
+                return _corsify_actual_response(jsonify({"error": "Invalid input"}), 400)
 
-        rospy.loginfo(f"Program '{program_name}' requested")
-        if program_name not in PROGRAMS:
-            rospy.loginfo(f"Program '{program_name}' does not exist")
-            return jsonify({'error': 'Unknown program'}), 400
+            rospy.loginfo(f"Program '{program_name}' requested")
+            if program_name not in PROGRAMS:
+                rospy.loginfo(f"Program '{program_name}' does not exist")
+                return _corsify_actual_response(jsonify({'error': 'Unknown program'}), 400)
 
-        # # try to grab lock, if already held => someone else is running
-        if not program_lock.acquire(blocking=False):
-            return jsonify({'error': 'Another program is already running'}), 409
+            # # try to grab lock, if already held => someone else is running
+            if not program_lock.acquire(blocking=False):
+                return _corsify_actual_response(jsonify({'error': 'Another program is already running'}), 409)
 
-        # launch the program in its own thread so we return immediately
-        t = threading.Thread(
-            target=_run_program,
-            args=(program_name,),
-            daemon=True
-        )
-        t.start()
-        return jsonify({'status': 'Program started'}), 200
+            # launch the program in its own thread so we return immediately
+            t = threading.Thread(
+                target=_run_program,
+                args=(program_name,),
+                daemon=True
+            )
+            t.start()
+            return _corsify_actual_response(jsonify({'status': 'Program started'}), 200)
 
     # Flask in background thread
     server = threading.Thread(
