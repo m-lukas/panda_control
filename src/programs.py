@@ -1,7 +1,7 @@
 from typing import Callable, Dict, List
 
 from controls import move_to_pose, home_gripper, move_to_home, grasp
-from notifier import notify_arm_location, notify_handover_finished
+from notifier import notify_arm_location, notify_handover_finished, notify_task_completed
 
 
 class MoveToHandoverProgram:
@@ -299,6 +299,8 @@ def move_to_packaging(move_group, *args, **kwargs):
         number_of_items_in_container = 0
 
     if current_container_index >= len(packaging_containers):
+        notify_task_completed()
+    else:
         notify_handover_finished()
     
     # move to packaging common
