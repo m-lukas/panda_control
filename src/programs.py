@@ -252,6 +252,21 @@ right_tray_handovers: List[MoveToHandoverProgram] = [
 ]
 
 
+def __increase_packaging_counter() -> None:
+    global packaging_containers, current_container_index, number_of_items_in_container
+
+    number_of_items_in_container += 1
+    print("Current Container:", current_container_index, "--", "Number of Items:", number_of_items_in_container)
+    if number_of_items_in_container == 8:
+        current_container_index += 1
+        number_of_items_in_container = 0
+
+    if current_container_index >= len(packaging_containers):
+        notify_task_completed()
+    else:
+        notify_handover_finished()
+
+
 def move_to_left_tray(move_group, *args, **kwargs):
     global left_tray_handovers, left_tray_index
 
@@ -280,8 +295,16 @@ def move_to_right_tray(move_group, *args, **kwargs):
     right_tray_index += 1
 
 
+def move_to_error_pose(move_group, *args, **kwargs):
+    # move to idle
+    move_to_pose(move_group, 0.030467100035464555, -1.5941579964038257, 1.7121470146322146, -2.864846397348909, 0.3153906897900572, 2.836382126900885, -0.9636582828031645, 0.015079365111887455, 0.015079365111887455, 0.2)
+    notify_arm_location("idle")
+
+    __increase_packaging_counter()
+
+
 def move_to_packaging(move_group, *args, **kwargs):
-    global packaging_containers, current_container_index, number_of_items_in_container
+    global packaging_containers, current_container_index
     # move to packaging common
     move_to_pose(move_group, 0.4672196006673697, -1.6546232406214665, 1.6710899174338891, -2.5156881482141054, 0.38071471120251543, 2.900895444644822, -1.0297259617315397, 0.01507969293743372, 0.01507969293743372, 0.15)
     notify_arm_location("packaging")
@@ -292,19 +315,10 @@ def move_to_packaging(move_group, *args, **kwargs):
     move_to_pose(move_group, cp.rotation_pose[0], cp.rotation_pose[1], cp.rotation_pose[2], cp.rotation_pose[3], cp.rotation_pose[4], cp.rotation_pose[5], cp.rotation_pose[6], None, None, 0.5)
     move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.5)
 
-    number_of_items_in_container += 1
-    print("Current Container:", current_container_index, "--", "Number of Items:", number_of_items_in_container)
-    if number_of_items_in_container == 8:
-        current_container_index += 1
-        number_of_items_in_container = 0
-
     # move to packaging common
     move_to_pose(move_group, 0.4672196006673697, -1.6546232406214665, 1.6710899174338891, -2.5156881482141054, 0.38071471120251543, 2.900895444644822, -1.0297259617315397, 0.01507969293743372, 0.01507969293743372, 0.2)
 
-    if current_container_index >= len(packaging_containers):
-        notify_task_completed()
-    else:
-        notify_handover_finished()
+    __increase_packaging_counter()
 
 
 def move_to_idle(move_group, *args, **kwargs):
@@ -364,6 +378,7 @@ def full_test(move_group, *args, **kwargs):
 PROGRAMS: Dict[str, Callable] = {
     "move_to_left_tray": move_to_left_tray,
     "move_to_right_tray": move_to_right_tray,
+    "move_to_error_pose": move_to_error_pose,
     "move_to_packaging": move_to_packaging,
     "move_to_idle": move_to_idle,
     "wink": wink,
