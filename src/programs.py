@@ -16,7 +16,6 @@ class ContainerProgram:
       self.container_pose = container_pose
       self.rotation_pose = rotation_pose
 
-
 left_tray_index = 0
 right_tray_index = 0
 
@@ -252,6 +251,28 @@ right_tray_handovers: List[MoveToHandoverProgram] = [
 ]
 
 
+named_poses = {
+    "idle": {
+        "joint1": 0.030467100035464555,
+        "joint2": -1.5941579964038257,
+        "joint3": 1.7121470146322146,
+        "joint4": -2.864846397348909,
+        "joint5": 0.3153906897900572,
+        "joint6": 2.836382126900885,
+        "joint7": -0.9636582828031645
+    },
+    "packaging_common": {
+        "joint1": 0.4672196006673697,
+        "joint2": -1.6546232406214665,
+        "joint3": 1.6710899174338891,
+        "joint4": -2.5156881482141054,
+        "joint5": 0.38071471120251543,
+        "joint6": 2.900895444644822,
+        "joint7": -1.0297259617315397
+    }
+}
+
+
 def __increase_packaging_counter() -> None:
     global packaging_containers, current_container_index, number_of_items_in_container
 
@@ -297,7 +318,7 @@ def move_to_right_tray(move_group, *args, **kwargs):
 
 def move_to_error_pose(move_group, *args, **kwargs):
     # move to idle
-    move_to_pose(move_group, 0.030467100035464555, -1.5941579964038257, 1.7121470146322146, -2.864846397348909, 0.3153906897900572, 2.836382126900885, -0.9636582828031645, 0.015079365111887455, 0.015079365111887455, 0.2)
+    move_to_pose(move_group, speed=0.2, **named_poses["idle"])
     notify_arm_location("idle")
 
     __increase_packaging_counter()
@@ -306,23 +327,23 @@ def move_to_error_pose(move_group, *args, **kwargs):
 def move_to_packaging(move_group, *args, **kwargs):
     global packaging_containers, current_container_index
     # move to packaging common
-    move_to_pose(move_group, 0.4672196006673697, -1.6546232406214665, 1.6710899174338891, -2.5156881482141054, 0.38071471120251543, 2.900895444644822, -1.0297259617315397, 0.01507969293743372, 0.01507969293743372, 0.15)
+    move_to_pose(move_group, speed=0.2, **named_poses["packaging_common"])
     notify_arm_location("packaging")
 
     # move to specific container and rotate
     cp = packaging_containers[current_container_index]
-    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.2)
+    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.25)
     move_to_pose(move_group, cp.rotation_pose[0], cp.rotation_pose[1], cp.rotation_pose[2], cp.rotation_pose[3], cp.rotation_pose[4], cp.rotation_pose[5], cp.rotation_pose[6], None, None, 0.5)
     move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.5)
 
     # move to packaging common
-    move_to_pose(move_group, 0.4672196006673697, -1.6546232406214665, 1.6710899174338891, -2.5156881482141054, 0.38071471120251543, 2.900895444644822, -1.0297259617315397, 0.01507969293743372, 0.01507969293743372, 0.2)
+    move_to_pose(move_group, speed=0.25, **named_poses["packaging_common"])
 
     __increase_packaging_counter()
 
 
 def move_to_idle(move_group, *args, **kwargs):
-    move_to_pose(move_group, 0.030467100035464555, -1.5941579964038257, 1.7121470146322146, -2.864846397348909, 0.3153906897900572, 2.836382126900885, -0.9636582828031645, 0.015079365111887455, 0.015079365111887455)
+    move_to_pose(move_group, **named_poses["idle"])
     notify_arm_location("idle")
 
 
