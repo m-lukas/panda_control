@@ -312,7 +312,7 @@ def move_to_right_tray(move_group, *args, **kwargs):
     notify_arm_location("handover_location")
 
     # move to specific handover location
-    move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6])
+    move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6], 0.15)
     right_tray_index += 1
 
 
