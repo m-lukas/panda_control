@@ -55,6 +55,13 @@ def control():
     def _corsify_actual_response(response, status_code=200):
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response, status_code
+    
+    @app.route("/", methods=["GET", "OPTIONS"])
+    def status():
+        if request.method == "OPTIONS":
+            return _build_cors_preflight_response()
+
+        return _corsify_actual_response(jsonify({"status": "ok"}))
 
     @app.route('/start', methods=["POST", "OPTIONS"])
     def start_program():
