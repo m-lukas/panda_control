@@ -319,7 +319,7 @@ def move_to_right_tray(move_group, *args, **kwargs):
 def move_to_error_pose(move_group, *args, **kwargs):
     # move to idle
     move_to_pose(move_group, speed=0.2, **named_poses["idle"])
-    notify_arm_location("idle")
+    notify_arm_location("error_pose")
 
     __increase_packaging_counter()
 
