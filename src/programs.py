@@ -291,7 +291,10 @@ def __increase_packaging_counter() -> None:
 def move_to_left_tray(move_group, *args, **kwargs):
     global left_tray_handovers, left_tray_index
 
-    program = left_tray_handovers[left_tray_index]
+    if left_tray_index < len(left_tray_handovers):
+        program = left_tray_handovers[left_tray_index]
+    else:
+        program = left_tray_handovers[len(left_tray_handovers)-1]
 
     # move to close to handover location
     move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], None, None, program.speed)
@@ -305,7 +308,10 @@ def move_to_left_tray(move_group, *args, **kwargs):
 def move_to_right_tray(move_group, *args, **kwargs):
     global right_tray_handovers, right_tray_index
 
-    program = right_tray_handovers[right_tray_index]
+    if right_tray_index < len(right_tray_handovers):
+        program = right_tray_handovers[right_tray_index]
+    else:
+        program = right_tray_handovers[len(right_tray_handovers)-1]
 
     # move to close to handover location
     move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], None, None, program.speed)
