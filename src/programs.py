@@ -295,11 +295,11 @@ def move_to_left_tray(move_group, *args, **kwargs):
 
     # move to close to handover location
     move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], None, None, program.speed)
-    notify_arm_location("handover_location")
-
+    
     # move to specific handover location
     move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6])
     left_tray_index += 1
+    notify_arm_location("handover_location")
 
 
 def move_to_right_tray(move_group, *args, **kwargs):
@@ -309,11 +309,11 @@ def move_to_right_tray(move_group, *args, **kwargs):
 
     # move to close to handover location
     move_to_pose(move_group, program.target_1[0], program.target_1[1], program.target_1[2], program.target_1[3], program.target_1[4], program.target_1[5], program.target_1[6], None, None, program.speed)
-    notify_arm_location("handover_location")
 
     # move to specific handover location
     move_to_pose(move_group, program.target_2[0], program.target_2[1], program.target_2[2], program.target_2[3], program.target_2[4], program.target_2[5], program.target_2[6], 0.15)
     right_tray_index += 1
+    notify_arm_location("handover_location")
 
 
 def move_to_error_pose(move_group, *args, **kwargs):
