@@ -318,7 +318,7 @@ def move_to_right_tray(move_group, *args, **kwargs):
 
 def move_to_error_pose(move_group, *args, **kwargs):
     # move to idle
-    move_to_pose(move_group, speed=0.2, **named_poses["idle"])
+    move_to_pose(move_group, speed=0.3, **named_poses["idle"])
     notify_arm_location("error_pose")
 
     __increase_packaging_counter()
@@ -327,17 +327,17 @@ def move_to_error_pose(move_group, *args, **kwargs):
 def move_to_packaging(move_group, *args, **kwargs):
     global packaging_containers, current_container_index
     # move to packaging common
-    move_to_pose(move_group, speed=0.2, **named_poses["packaging_common"])
+    move_to_pose(move_group, speed=0.25, **named_poses["packaging_common"])
     notify_arm_location("packaging")
 
     # move to specific container and rotate
     cp = packaging_containers[current_container_index]
-    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.25)
+    move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.3)
     move_to_pose(move_group, cp.rotation_pose[0], cp.rotation_pose[1], cp.rotation_pose[2], cp.rotation_pose[3], cp.rotation_pose[4], cp.rotation_pose[5], cp.rotation_pose[6], None, None, 0.5)
     move_to_pose(move_group, cp.container_pose[0], cp.container_pose[1], cp.container_pose[2], cp.container_pose[3], cp.container_pose[4], cp.container_pose[5], cp.container_pose[6], None, None, 0.5)
 
     # move to packaging common
-    move_to_pose(move_group, speed=0.25, **named_poses["packaging_common"])
+    move_to_pose(move_group, speed=0.3, **named_poses["packaging_common"])
 
     __increase_packaging_counter()
 
