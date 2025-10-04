@@ -29,15 +29,13 @@ def control():
     rospy.loginfo("End effector link: %s" % move_group.get_end_effector_link())
     rospy.loginfo("Available Planning Groups: %s" % robot.get_group_names())
 
-    # Setup webserver
+    # Configure webserver
     app = Flask(__name__)
-    program_lock = threading.Lock()  # ensures only one program runs at a time
+    program_lock = threading.Lock()  # ensures only one robot program runs at a time
 
     def _run_program(name):
         try:
             rospy.loginfo(f"Starting program '{name}'")
-            # dispatch to your function; most programs take only move_group,
-            # others may read extra params from the JSON body
             PROGRAMS[name](move_group, home_gripper_client, grasp_client)
             rospy.loginfo(f"Program '{name}' completed")
         except Exception as e:
@@ -79,11 +77,11 @@ def control():
                 rospy.loginfo(f"Program '{program_name}' does not exist")
                 return _corsify_actual_response(jsonify({'error': 'Unknown program'}), 400)
 
-            # # try to grab lock, if already held => someone else is running
+            # # try to grab lock - if already held => someone program is running
             if not program_lock.acquire(blocking=False):
                 return _corsify_actual_response(jsonify({'error': 'Another program is already running'}), 409)
 
-            # launch the program in its own thread so we return immediately
+            # launch program in its own thread
             t = threading.Thread(
                 target=_run_program,
                 args=(program_name,),
@@ -92,7 +90,7 @@ def control():
             t.start()
             return _corsify_actual_response(jsonify({'status': 'Program started'}), 200)
 
-    # Flask in background thread
+    # Web server in background thread
     server = threading.Thread(
         target=lambda: app.run(host='0.0.0.0', port=3333),
         daemon=True
