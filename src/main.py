@@ -100,7 +100,7 @@ def control():
     # keep ROS alive
     rospy.spin()
 
-    # clean up
+    # clean up at shutdown
     moveit_commander.roscpp_shutdown()
 
 if __name__ == '__main__':
